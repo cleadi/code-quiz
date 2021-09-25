@@ -1,0 +1,15 @@
+#header {
+  padding: 60px;
+  text-align: center;
+  background: #1ab1bc;
+  color: white;
+  font-size: 30px;
+}
+
+#header h1 {
+  font-size: larger;
+}
+
+#questionsDiv {
+  display: none;
+}
