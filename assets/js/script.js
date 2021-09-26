@@ -5,20 +5,17 @@
     - Each correct answer earns a point and user moves on to next question
     - When a question is answered incorrectly, 3 seconds is removed from the clock
     - When all questions are answered correctly OR the timer hits 0, the quiz is over
-    - When the game is over I can save my initals and my score
+    - When the game is over I can save my initals and my score <-- only this left to do
 */
 
-// var count = localStorage.getItem("count");
-// count.textCounter = count;
-// localStorage.setItem("count", count);
-
-var answersArea = document.getElementById("answer-buttons");
-
-var secondsLeft = 60; // leave until the end
+var answersArea = document.getElementById("answer-buttons"); // calls the "answer-buttons" div tag in HTML
+var secondsLeft = 60;
 var questionsIndex = 0;
-
+var userPointsTotal = 0;
 var timeInterval;
-
+var clickBtn = document.getElementById("starting-click"); // starts the quiz 1/2
+var headerDiv = document.getElementById("header");
+var questionsDiv = document.getElementById("questionsDiv");
 var quizQuestions = [
   {
     questionText: "What is JavaScript?",
@@ -26,90 +23,88 @@ var quizQuestions = [
     correctAnswer: "Programming language"
   },
   {
-    questionText: "What is the capitol of MN?",
-    choices: ["Saint Paul", "Minneapolis", "Green Bay", "Saint Cloud"],
-    correctAnswer: "Saint Paul"
+    questionText: "What does DOM stand for?",
+    choices: ["Document Object Model", "Donuts On Mouths", "Don't Only Moan", "Digital Only Mode"],
+    correctAnswer: "Document Object Model"
+  },
+  {
+    questionText: "What are the two other primary web development languages?",
+    choices: ["Markdown & RTF", "BLT & PBJ", "RTL & CNN", "HTML & CSS"],
+    correctAnswer: "HTML & CSS"
+  },
+  {
+    questionText: "Is JavaScript the same language as Java?",
+    choices: ["Yes, obviously", "No 🤬", "Of course, obviously", "Duhh, obviously"],
+    correctAnswer: "No 🤬"
   },
   {
     questionText: "What is the capitol of MN?",
-    choices: ["Saint Paul", "Minneapolis", "Green Bay", "Saint Cloud"],
-    correctAnswer: "Saint Paul"
-  },
-  {
-    questionText: "What is the capitol of MN?",
-    choices: ["Saint Paul", "Minneapolis", "Green Bay", "Saint Cloud"],
-    correctAnswer: "Saint Paul"
-  },
-  {
-    questionText: "What is the capitol of MN?",
-    choices: ["Saint Paul", "Minneapolis", "Green Bay", "Saint Cloud"],
+    choices: ["Saint Paul", "This isn't a JavaScript question!", "Green Bay", "New York City"],
     correctAnswer: "Saint Paul"
   },
 ];
 
-var clickBtn = document.getElementById("starting-click");
-var headerDiv = document.getElementById("header");
-var questionsDiv = document.getElementById("questionsDiv");
+function displayScore() {
+  var newHeadline = document.createElement("h1");
+  newHeadline.textContent = "Game over! Your final score is " + userPointsTotal + "points!";
+  document.body.appendChild(newHeadline);
+}
+
+function startTimer() {
+  timeInterval = setInterval(function () {
+    if (secondsLeft > 1) {
+      secondsLeft.textContent = secondsLeft + " seconds remaining.";
+      secondsLeft--;
+    } else if (secondsLeft === 1) {
+      secondsLeft.textContent = " second remaining.";
+      secondsLeft--;
+    } else {
+      secondsLeft.textContent = " seconds remaining.";
+      clearInterval(timeInterval);
+      if (clearInterval) {
+        displayScore();
+      }
+    }
+  }, 1000);
+  showQuestion();
+}
 
 clickBtn.addEventListener("click", function(event){
   headerDiv.style.display = "none";
-  questionsDiv.style.display = "block"; // look into other displays
+  questionsDiv.style.display = "block"; // look into other displays?? (Gary's note)
   startTimer();
 });
 
 function showQuestion() {
   if( questionsIndex <= quizQuestions.length ){
-    document.getElementById("askQuestion").textContent = quizQuestions[questionsIndex].questionText; // stopped HERE with Lilo
+    document.getElementById("askQuestion").textContent = quizQuestions[questionsIndex].questionText;
     answersArea.innerHTML = "";
-    for (var i = 0; i < quizQuestions[questionsIndex].choices.length; i++) {
+    for (var i = 0; i < quizQuestions[questionsIndex].choices.length; i++) { // math to calculate how many questions left
       var currAnswer = quizQuestions[questionsIndex].choices[i];
       var btn = document.createElement("button");
       btn.textContent = currAnswer;
       answersArea.appendChild(btn);
-      // Kathy helped to here <-- need to find a way to check the whole array (loop through the array?)
     }
   }
 }
 
 // this fires off every time a question is answered
-answersArea.addEventListener("click", function(event){
-  if( event.target.matches("button") ){
+answersArea.addEventListener("click", function (event) {
+  if (event.target.matches("button")) {
     var correct = quizQuestions[questionsIndex].correctAnswer;
     var buttonClicked = event.target.textContent;
-    if( buttonClicked === correct ){
-      // the user guessed right, add 1 point to total
-      // create global variable - DC
+    if (buttonClicked === correct) {
+      userPointsTotal++;
     } else {
-      // the user guessed wrong
-      secondsLeft = secondsLeft - 10;  // subtract more seconds from time remaining
+      userPointsTotal--;
+      secondsLeft = secondsLeft - 10;
     }
-    // are all the questioned answered
     questionsIndex++;
-
-    if( questionsIndex === quizQuestions.length ){
+    if (questionsIndex === quizQuestions.length) {
       // end the game and calculate final score
+      displayScore();
     } else {
       showQuestion();
     }
   }
 })
-
-function startTimer() {
-  timeInterval = setInterval(function () {
-    if (secondsLeft > 1) {
-      clickBtn.textContent = secondsLeft + " seconds remaining";
-      secondsLeft--;
-    } else if (secondsLeft === 1) {
-      clickBtn.textContent = " second remaining";
-      secondsLeft--;
-    } else {
-      timerEl.textContent = "";
-      clearInterval(timeInterval);
-
-      // end game message, show final score?? - DC
-
-      // displayMessage();
-    }
-  }, 1000);
-  showQuestion();
-}
