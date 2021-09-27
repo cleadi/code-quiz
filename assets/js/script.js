@@ -5,17 +5,21 @@
     - Each correct answer earns a point and user moves on to next question
     - When a question is answered incorrectly, 3 seconds is removed from the clock
     - When all questions are answered correctly OR the timer hits 0, the quiz is over
-    - When the game is over I can save my initals and my score <-- only this left to do
+    - When the game is over I can save my initals and my score
 */
 
-var answersArea = document.getElementById("answer-buttons"); // calls the "answer-buttons" div tag in HTML
+// timer still doesn't display on the page, otherwise only syling needs to/could be tweaked to look better
+
+var answersArea = document.getElementById("answer-buttons");
 var secondsLeft = 60;
 var questionsIndex = 0;
 var userPointsTotal = 0;
 var timeInterval;
-var clickBtn = document.getElementById("starting-click"); // starts the quiz 1/2
+var clickBtn = document.getElementById("starting-click");
 var headerDiv = document.getElementById("header");
 var questionsDiv = document.getElementById("questionsDiv");
+var score = localStorage.getItem("score");
+
 var quizQuestions = [
   {
     questionText: "What is JavaScript?",
@@ -46,7 +50,8 @@ var quizQuestions = [
 
 function displayScore() {
   var newHeadline = document.createElement("h1");
-  newHeadline.textContent = "Game over! Your final score is " + userPointsTotal + "points!";
+  newHeadline.textContent = "Game over! Your final score is " + userPointsTotal + " points!";
+  localStorage.setItem("score", userPointsTotal)
   document.body.appendChild(newHeadline);
 }
 
@@ -56,10 +61,10 @@ function startTimer() {
       secondsLeft.textContent = secondsLeft + " seconds remaining.";
       secondsLeft--;
     } else if (secondsLeft === 1) {
-      secondsLeft.textContent = " second remaining.";
+      secondsLeft.textContent = secondsLeft + " second remaining.";
       secondsLeft--;
     } else {
-      secondsLeft.textContent = " seconds remaining.";
+      secondsLeft.textContent = secondsLeft + " seconds remaining.";
       clearInterval(timeInterval);
       if (clearInterval) {
         displayScore();
@@ -69,17 +74,17 @@ function startTimer() {
   showQuestion();
 }
 
-clickBtn.addEventListener("click", function(event){
+clickBtn.addEventListener("click", function (event) {
   headerDiv.style.display = "none";
-  questionsDiv.style.display = "block"; // look into other displays?? (Gary's note)
+  questionsDiv.style.display = "block";
   startTimer();
 });
 
 function showQuestion() {
-  if( questionsIndex <= quizQuestions.length ){
+  if (questionsIndex <= quizQuestions.length) {
     document.getElementById("askQuestion").textContent = quizQuestions[questionsIndex].questionText;
     answersArea.innerHTML = "";
-    for (var i = 0; i < quizQuestions[questionsIndex].choices.length; i++) { // math to calculate how many questions left
+    for (var i = 0; i < quizQuestions[questionsIndex].choices.length; i++) {
       var currAnswer = quizQuestions[questionsIndex].choices[i];
       var btn = document.createElement("button");
       btn.textContent = currAnswer;
@@ -88,7 +93,6 @@ function showQuestion() {
   }
 }
 
-// this fires off every time a question is answered
 answersArea.addEventListener("click", function (event) {
   if (event.target.matches("button")) {
     var correct = quizQuestions[questionsIndex].correctAnswer;
@@ -101,7 +105,6 @@ answersArea.addEventListener("click", function (event) {
     }
     questionsIndex++;
     if (questionsIndex === quizQuestions.length) {
-      // end the game and calculate final score
       displayScore();
     } else {
       showQuestion();
