@@ -8,17 +8,15 @@
     - When the game is over I can save my initals and my score
 */
 
-// timer still doesn't display on the page, otherwise only syling needs to/could be tweaked to look better
-
 var answersArea = document.getElementById("answer-buttons");
+var clickBtn = document.getElementById("starting-click");
+var headerDiv = document.getElementById("header");
+var questionsDiv = document.getElementById("questions-div");
+var score = localStorage.getItem("score");
 var secondsLeft = 60;
 var questionsIndex = 0;
 var userPointsTotal = 0;
 var timeInterval;
-var clickBtn = document.getElementById("starting-click");
-var headerDiv = document.getElementById("header");
-var questionsDiv = document.getElementById("questionsDiv");
-var score = localStorage.getItem("score");
 
 var quizQuestions = [
   {
@@ -51,28 +49,29 @@ var quizQuestions = [
 function displayScore() {
   var newHeadline = document.createElement("h1");
   newHeadline.textContent = "Game over! Your final score is " + userPointsTotal + " points!";
-  localStorage.setItem("score", userPointsTotal)
+  localStorage.setItem("score", userPointsTotal);
   document.body.appendChild(newHeadline);
-}
+};
 
 function startTimer() {
+  var displayTimer = document.querySelector(".timer");
   timeInterval = setInterval(function () {
+    console.log(secondsLeft);
     if (secondsLeft > 1) {
-      secondsLeft.textContent = secondsLeft + " seconds remaining.";
       secondsLeft--;
+      displayTimer.textContent = secondsLeft + " seconds remaining.";
     } else if (secondsLeft === 1) {
-      secondsLeft.textContent = secondsLeft + " second remaining.";
       secondsLeft--;
+      displayTimer.textContent = secondsLeft + " second remaining.";
     } else {
-      secondsLeft.textContent = secondsLeft + " seconds remaining.";
+      displayTimer.textContent = 0 + " seconds remaining.";
       clearInterval(timeInterval);
-      if (clearInterval) {
-        displayScore();
-      }
+      displayScore();
+      questionsDiv.style.display = "none";
     }
   }, 1000);
   showQuestion();
-}
+};
 
 clickBtn.addEventListener("click", function (event) {
   headerDiv.style.display = "none";
@@ -82,7 +81,7 @@ clickBtn.addEventListener("click", function (event) {
 
 function showQuestion() {
   if (questionsIndex <= quizQuestions.length) {
-    document.getElementById("askQuestion").textContent = quizQuestions[questionsIndex].questionText;
+    document.getElementById("ask-question").textContent = quizQuestions[questionsIndex].questionText; // <-- what's happening here?
     answersArea.innerHTML = "";
     for (var i = 0; i < quizQuestions[questionsIndex].choices.length; i++) {
       var currAnswer = quizQuestions[questionsIndex].choices[i];
@@ -91,23 +90,27 @@ function showQuestion() {
       answersArea.appendChild(btn);
     }
   }
-}
+};
 
 answersArea.addEventListener("click", function (event) {
   if (event.target.matches("button")) {
-    var correct = quizQuestions[questionsIndex].correctAnswer;
+    var correct = quizQuestions[questionsIndex].correctAnswer; // <-- getting an error here: "Uncaught TypeError: Cannot read properties of undefined (reading 'correctAnswer') at HTMLDivElement.<anonymous>"" // ignore for now 
     var buttonClicked = event.target.textContent;
     if (buttonClicked === correct) {
       userPointsTotal++;
     } else {
-      userPointsTotal--;
-      secondsLeft = secondsLeft - 10;
+      if(secondsLeft < 10) {
+        secondsLeft = 0
+      } else {
+        secondsLeft = secondsLeft - 10;
+      }
     }
     questionsIndex++;
     if (questionsIndex === quizQuestions.length) {
+      questionsDiv.style.display = "none";
       displayScore();
     } else {
       showQuestion();
     }
   }
-})
+});
